@@ -1,7 +1,7 @@
 import { createPublicClient, GetLogsReturnType, http, parseAbiItem } from 'viem'
 import { lineaSepolia } from 'viem/chains'
 
-export const getSepoliaTx = async (user: `0x${string}`) => {
+export const getSepoliaFaucetTx = async (user: `0x${string}`) => {
   const client = createPublicClient({
     chain: lineaSepolia,
     transport: http(`https://linea-sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`),
