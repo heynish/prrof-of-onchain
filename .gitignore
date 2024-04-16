@@ -22,3 +22,6 @@ yarn-error.log*
 
 # frog static assets
 public/frog
+
+#Idea
+/idea
