@@ -4,6 +4,8 @@ import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/middlewares'
 import { getLXPBalance } from './getLXPBalance.ts'
 
+const MINT_URL = 'https://app.phosphor.xyz/26cf2af6-7dbf-45b7-8d0c-0f59b58463a4/drops/bf728add-c57e-4b37-8490-70936e5d10d9/ecbe8ed8-f5df-42c9-9bb8-4ec6c302753a/52f5ce4c-f107-4687-bf29-54490f9fdd85'
+
 const neynarMiddleware = neynar({
   apiKey: 'NEYNAR_FROG_FM',
   features: ['interactor', 'cast'],
@@ -85,6 +87,9 @@ app.frame('/verify', neynarMiddleware,async (c) => {
 
   return c.res({
     image: '/frame_3_verify_true_no_results.png',
+    intents: [
+      <Button.Link href={MINT_URL}>Mint</Button.Link>,
+    ]
   })
 })
 
