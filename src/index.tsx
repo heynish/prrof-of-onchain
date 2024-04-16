@@ -50,7 +50,12 @@ app.frame('/verify', neynarMiddleware,async (c) => {
   // Verify Dili Secret
   if (inputText !== process.env.DILI_SECRET) {
     return c.res({
+      action: '/verify',
       image: '/frame_3_verify_false_no_results.png',
+      intents: [
+        <TextInput placeholder="Enter the secret..." />,
+        <Button value="next">Verify</Button>,
+        ]
     })
   }
 
@@ -69,7 +74,12 @@ app.frame('/verify', neynarMiddleware,async (c) => {
   console.log(Number(lxpBalance))
   if (Number(lxpBalance) <= 0) {
     return c.res({
+      action: '/verify',
       image: '/frame_3_verify_false_no_results.png',
+      intents: [
+        <TextInput placeholder="Enter the secret..." />,
+        <Button value="next">Verify</Button>,
+      ]
     })
   }
 
