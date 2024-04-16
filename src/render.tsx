@@ -1,7 +1,6 @@
+import { FC } from 'hono/jsx'
 
-
-
-export const renderVerifyElement = (h1: string, p1: string) => {
+export const renderVerifyElement = (h1: string, p1: string, content: FC) => {
   return (
     <div style={{
       backgroundColor: '#81e9d4',
@@ -27,8 +26,9 @@ export const renderVerifyElement = (h1: string, p1: string) => {
         <h1 style={{ fontSize: 36 }}>{h1}</h1>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 'auto' }}>
-        <p style={{ fontSize: 24 }}>{p1}</p>
+        <p style={{ fontSize: 36 }}>{p1}</p>
       </div>
+      {content}
       <div
         style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 'auto', marginBottom: 0 }}>
         <img

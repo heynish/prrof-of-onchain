@@ -3,8 +3,11 @@ import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/middlewares'
 import { getLXPBalance } from './getLXPBalance.ts'
+import { renderVerifyElement } from './render.tsx'
+import { FC } from 'hono/jsx'
 
 const MINT_URL = 'https://app.phosphor.xyz/26cf2af6-7dbf-45b7-8d0c-0f59b58463a4/drops/bf728add-c57e-4b37-8490-70936e5d10d9/ecbe8ed8-f5df-42c9-9bb8-4ec6c302753a/52f5ce4c-f107-4687-bf29-54490f9fdd85'
+const MIN_LXP_BALANCE = 0
 
 const neynarMiddleware = neynar({
   apiKey: 'NEYNAR_FROG_FM',
@@ -51,9 +54,12 @@ app.frame('/verify', neynarMiddleware,async (c) => {
   const { inputText} = c
   // Verify Dili Secret
   if (inputText !== process.env.DILI_SECRET) {
+    const content: FC = () => (
+      <p style={{ fontSize: 26 }}>Failed secret verification</p>
+    );
     return c.res({
       action: '/verify',
-      image: '/frame_3_verify_false_no_results.png',
+      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content),
       intents: [
         <TextInput placeholder="Enter the secret..." />,
         <Button value="next">Verify</Button>,
@@ -72,12 +78,13 @@ app.frame('/verify', neynarMiddleware,async (c) => {
       })
     )
   ).reduce((acc, balance) => acc + BigInt(balance), BigInt(0));
-
-  console.log(Number(lxpBalance))
-  if (Number(lxpBalance) <= 0) {
+  if (Number(lxpBalance) <= MIN_LXP_BALANCE) {
+    const content: FC = () => (
+      <p style={{ fontSize: 26 }}>Your LXP balance is {Number(lxpBalance).toString()}</p>
+    );
     return c.res({
       action: '/verify',
-      image: '/frame_3_verify_false_no_results.png',
+      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content),
       intents: [
         <TextInput placeholder="Enter the secret..." />,
         <Button value="next">Verify</Button>,
