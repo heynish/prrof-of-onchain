@@ -40,7 +40,7 @@ app.frame('/dili', async (c) => {
     action: '/verify',
     image: '/frame_2_dili_secret_.png',
     intents: [
-      <TextInput placeholder="Enter the secret..." />,
+      <TextInput placeholder="Enter the secret..."/>,
       <Button value="next">Next</Button>,
     ]
   })
