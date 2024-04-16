@@ -4,7 +4,7 @@
 export const renderVerifyElement = (h1: string, p1: string) => {
   return (
     <div style={{
-      backgroundColor: '#c9f8ff',
+      backgroundColor: '#81e9d4',
       textAlign: 'center',
       padding: 20,
       display: 'flex',
@@ -14,15 +14,14 @@ export const renderVerifyElement = (h1: string, p1: string) => {
     }}>
       <div style={{
         backgroundColor: 'white',
-        borderRadius: '50%',
-        width: '120%',
-        height: '120%',
+        borderRadius: 500,
+        width: 1000,
+        height: 1000,
         position: 'absolute',
         top: '50%',
-        left: '50%',
+        left: '52%',
         display: 'flex',
         transform: 'translate(-50%, -50%)',
-        zIndex: 1
       }}></div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <h1 style={{ fontSize: 36 }}>{h1}</h1>
@@ -35,17 +34,17 @@ export const renderVerifyElement = (h1: string, p1: string) => {
         <img
           src="/infura.png"
           alt="Infura Logo"
-          style={{ height: 100, marginRight: 20 }}
+          style={{ height: 150, marginRight: 20 }}
         />
         <img
-          src="/infura.png"
+          src="/din.png"
           alt="DAN Logo"
-          style={{ height: 30, width: 30, marginRight: 20 }}
+          style={{ height: 80, marginRight: 20 }}
         />
         <img
           src="/diligence.png"
           alt="ConsenSys Diligence Logo"
-          style={{ height: 50 }}
+          style={{ height: 80 }}
         />
       </div>
     </div>
