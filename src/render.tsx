@@ -1,6 +1,6 @@
 import { FC } from 'hono/jsx'
 
-export const renderVerifyElement = (h1: string, p1: string, content: FC) => {
+export const renderVerifyElement = (h1: string, p1: string, content: any) => {
   return (
     <div style={{
       backgroundColor: '#81e9d4',

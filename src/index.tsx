@@ -5,6 +5,7 @@ import { neynar } from 'frog/middlewares'
 import { getLXPBalance } from './getLXPBalance.ts'
 import { renderVerifyElement } from './render.tsx'
 import { FC } from 'hono/jsx'
+import 'dotenv/config';
 
 const MINT_URL = 'https://app.phosphor.xyz/26cf2af6-7dbf-45b7-8d0c-0f59b58463a4/drops/bf728add-c57e-4b37-8490-70936e5d10d9/ecbe8ed8-f5df-42c9-9bb8-4ec6c302753a/52f5ce4c-f107-4687-bf29-54490f9fdd85'
 const MIN_LXP_BALANCE = 0
@@ -39,11 +40,15 @@ app.frame('/faucet', async (c) => {
 })
 
 app.frame('/dili', async (c) => {
+  const content = () => (
+    <p style={{ fontSize: 26 }}>Solve the puzzle on the contract linked below to get the secret phrase.</p>
+  );
   return c.res({
     action: '/verify',
-    image: '/frame_2_dili_secret_.png',
+    image: renderVerifyElement('Last step before on-chain verification!', 'The phrase contract will be initialized at ETHBerlin04.', content()),
     intents: [
       <TextInput placeholder="Enter the secret..."/>,
+      <Button.Link href={process.env.CONTRACT_URL?.toString() ?? ''}>Puzzle Contract</Button.Link>,
       <Button value="next">Next</Button>,
     ]
   })
@@ -54,14 +59,15 @@ app.frame('/verify', neynarMiddleware,async (c) => {
   const { inputText} = c
   // Verify Dili Secret
   if (inputText !== process.env.DILI_SECRET) {
-    const content: FC = () => (
+    const content = () => (
       <p style={{ fontSize: 26 }}>Failed secret verification</p>
     );
     return c.res({
       action: '/verify',
-      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content),
+      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content()),
       intents: [
         <TextInput placeholder="Enter the secret..." />,
+        <Button.Link href={process.env.CONTRACT_URL?.toString() ?? ''}>Puzzle Contract</Button.Link>,
         <Button value="next">Verify</Button>,
         ]
     })
@@ -79,12 +85,12 @@ app.frame('/verify', neynarMiddleware,async (c) => {
     )
   ).reduce((acc, balance) => acc + BigInt(balance), BigInt(0));
   if (Number(lxpBalance) <= MIN_LXP_BALANCE) {
-    const content: FC = () => (
+    const content = () => (
       <p style={{ fontSize: 26 }}>Your LXP balance is {Number(lxpBalance).toString()}</p>
     );
     return c.res({
       action: '/verify',
-      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content),
+      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content()),
       intents: [
         <TextInput placeholder="Enter the secret..." />,
         <Button value="next">Verify</Button>,
