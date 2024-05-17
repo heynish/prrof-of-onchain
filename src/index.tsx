@@ -2,9 +2,7 @@ import { Button, Frog, TextInput } from 'frog'
 import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/middlewares'
-import { getLXPBalance } from './getLXPBalance.ts'
-import { renderVerifyElement } from './render.tsx'
-import { FC } from 'hono/jsx'
+import {addToWhiteList, mintNFT} from './phosphor'
 import 'dotenv/config';
 
 const MINT_URL = 'https://app.phosphor.xyz/26cf2af6-7dbf-45b7-8d0c-0f59b58463a4/drops/bf728add-c57e-4b37-8490-70936e5d10d9/ecbe8ed8-f5df-42c9-9bb8-4ec6c302753a/52f5ce4c-f107-4687-bf29-54490f9fdd85'
@@ -20,7 +18,7 @@ export const app = new Frog()
 app.frame('/', async (c) => {
   return c.res({
     action: '/faucet',
-    image: '/frame_0_welcome.png',
+    image: '/ETHBerlin-2024_Farcaster-Frames_01.png',
     intents: [
       <Button value="get-started">Get Started</Button>,
     ]
@@ -30,81 +28,81 @@ app.frame('/', async (c) => {
 app.frame('/faucet', async (c) => {
   return c.res({
     action: '/dili',
-    image: '/frame_1_infura_linea_faucet.png',
+    image: '/ETHBerlin-2024_Farcaster-Frames_02.png',
     intents: [
       <Button.Link href="https://app.infura.io/register">Sign up</Button.Link>,
       <Button.Link href="https://www.infura.io/faucet/linea">Claim ETH</Button.Link>,
-      <Button value="next">Next</Button>,
+      <Button value="next">CTF and NFT mint</Button>,
     ]
   })
 })
 
 app.frame('/dili', async (c) => {
   const content = () => (
-    <p style={{ fontSize: 26 }}>Solve the puzzle on the contract linked below to get the secret phrase.</p>
+    <p style={{ fontSize: 26 }}>Solve the puzzle in the code of the contract linked below to get the secret.</p>
   );
   return c.res({
-    action: '/verify',
-    image: renderVerifyElement('Last step before on-chain verification!', 'The phrase contract will be initialized at ETHBerlin04.', content()),
+    image: '/ETHBerlin-2024_Farcaster-Frames_03.png',
     intents: [
       <TextInput placeholder="Enter the secret..."/>,
       <Button.Link href={process.env.CONTRACT_URL?.toString() ?? ''}>Puzzle Contract</Button.Link>,
-      <Button value="next">Next</Button>,
+      <Button action='/verify' value="next">Submit Answer</Button>,
     ]
   })
 })
 
 
-app.frame('/verify', neynarMiddleware,async (c) => {
+app.frame('/verify', neynarMiddleware,
+async (c) => {
   const { inputText} = c
   // Verify Dili Secret
   if (inputText !== process.env.DILI_SECRET) {
-    const content = () => (
-      <p style={{ fontSize: 26 }}>Failed secret verification</p>
-    );
     return c.res({
       action: '/verify',
-      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content()),
+      image: '/ETHBerlin-2024_Farcaster-Frames_04.png',
       intents: [
         <TextInput placeholder="Enter the secret..." />,
         <Button.Link href={process.env.CONTRACT_URL?.toString() ?? ''}>Puzzle Contract</Button.Link>,
-        <Button value="next">Verify</Button>,
+        <Button value="next">Submit Answer</Button>,
         ]
     })
   }
-
-  // Verify LXP Balance
-  const addresses = c.var.interactor?.verifiedAddresses?.ethAddresses || []
-  const lxpBalance = (
-    await Promise.all(
-      addresses.map((userAddress: string) => {
-        return getLXPBalance(
-          userAddress as `0x${string}`
-        );
-      })
-    )
-  ).reduce((acc, balance) => acc + BigInt(balance), BigInt(0));
-  if (Number(lxpBalance) <= MIN_LXP_BALANCE) {
-    const content = () => (
-      <p style={{ fontSize: 26 }}>Your LXP balance is {Number(lxpBalance).toString()}</p>
-    );
-    return c.res({
-      action: '/verify',
-      image: renderVerifyElement('PLEASE COMPLETE TASKS TO BE', 'ELIGIBLE TO MINT', content()),
-      intents: [
-        <TextInput placeholder="Enter the secret..." />,
-        <Button value="next">Verify</Button>,
-      ]
-    })
-  }
-
   return c.res({
-    image: '/frame_3_verify_true_no_results.png',
+    image: '/ETHBerlin-2024_Farcaster-Frames_06.png',
+    action:'/mint',
     intents: [
-      <Button.Link href={MINT_URL}>Mint</Button.Link>,
+      <Button value="mint">Mint</Button>,
     ]
   })
 })
+
+app.frame('/mint',neynarMiddleware,
+  async (c) => {
+    try {
+      const addresses = c.var.interactor?.verifiedAddresses?.ethAddresses || [];
+      // if addresses[0] is empty then use the custodyAddress
+      const address = addresses.length > 0 && addresses[0] ? addresses[0] : c.var.interactor?.custodyAddress || "";
+      const listing_id = process.env.LISTING_ID?.toString() || '';
+      await addToWhiteList(address, listing_id);
+      await mintNFT(address, listing_id);
+
+      stayIdle(1000);
+      return c.res({
+        image: '/ETHBerlin-2024_Farcaster-Frames_11.png',
+      })
+    } catch (e: any) {
+      console.log(e);
+      return c.res({
+        action:'/',
+        image:'/ETHBerlin-2024_Farcaster-Frames_error.png',
+        intents: [<Button>Back to Home</Button>],
+      });
+    }
+})
+
+export const stayIdle = (delayInMs: number) =>
+  new Promise((resolve) => setTimeout(resolve, delayInMs));
+
 
 const isCloudflareWorker = typeof caches !== 'undefined'
 if (isCloudflareWorker) {
